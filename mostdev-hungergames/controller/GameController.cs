@@ -14,6 +14,8 @@ namespace mostdev_hungergames.controller
 
         private Random random = new Random();
         public Contestent Winner { get; private set; }
+		private int days = 1;
+
         public void playGame()
         {
             Console.WriteLine("Gathering contestents...");
@@ -21,6 +23,12 @@ namespace mostdev_hungergames.controller
             Console.WriteLine("Now introducing the contestents:");
             contestents.ForEach(x => Console.WriteLine(x.ToString()));
             // loop through game
+
+			while (contestents.Count > 1)
+			{
+				nextRound();
+			}
+
             Winner = contestents[random.Next(contestents.Count - 1)];
 
         }
@@ -62,15 +70,48 @@ namespace mostdev_hungergames.controller
             }
         }
 
+		/// <summary>
+		/// generate a district contestent
+		/// </summary>
+		/// <param name="i">if i%2==0 the gender will be female, else male</param>
+		/// <returns>District contestent with a random defense bonus</returns>
         private Contestent getDistricsContestent(int i)
         {
             return new District(Faker.Name.First(), GetGender(i), random.Next(Constants.MIN_DEFENSE_BONUS, Constants.MAX_DEFENSE_BONUS));
         }
 
-        private Contestent GetCareerContestent(int i)
+		/// <summary>
+		/// generate a career contestent
+		/// </summary>
+		/// <param name="i">if i%2==0 the gender will be female, else male</param>
+		/// <returns>Career contestent with a random attack bonus and a chance on an battle item</returns>
+		private Contestent GetCareerContestent(int i)
         {
             return new Career(Faker.Name.First(), GetGender(i), random.Next(Constants.MIN_ATTACK_BONUS, Constants.MAX_ATTACK_BONUS), GetBattleItem());
         }
+
+		private void nextRound()
+		{
+			Console.WriteLine("\nday {0} has started, {1} contestents are alive", days++, contestents.Count);
+			// single round:
+			// pick N contestents and let them fight a duel. 
+			// duel based on attack defense and chance
+
+			// check if any of the contestents has died
+			contestents.RemoveAll(x => x.Health < 1);
+
+			// at end of day all health is restored
+			contestents.ForEach(x => x.resetHealth());
+
+			// at end of day surviving contestents have chance of finding battle item
+			contestents.ForEach(x => x.searchForBattleItem());
+			if (days > 20)
+			{
+				contestents.RemoveRange(1, contestents.Count-1);
+			}
+
+
+		}
 
     }
 }
