@@ -5,11 +5,11 @@ using mostdev_hungergames.constants.enums;
 
 namespace mostdev_hungergames.model.impl
 {
-    class Career : Contestent
+    class District : Contestent
     {
-        public Career(string name, Gender gender, int attackBonus, BattleItem battleItem) : base(name, gender)
+        public District(string name, Gender gender, int defenseBonus) : base(name, gender)
         {
-            this.AttackLevel += attackBonus;
+            this.DefenseLevel += defenseBonus;
         }
     }
 }
