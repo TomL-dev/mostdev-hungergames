@@ -38,7 +38,7 @@ namespace mostdev_hungergames.controller
             Contestent[] contestents = new Contestent[nrOfContestents];
             for (int i = 0; i < nrOfContestents; i++)
             {
-                contestents[i] = getRandomContestent();
+                contestents[i] = getContestent();
             }
             return contestents;
         }
@@ -57,7 +57,7 @@ namespace mostdev_hungergames.controller
         /// Get random contestent
         /// </summary>
         /// <returns>a Contestent</returns>
-        private Contestent getRandomContestent()
+        private Contestent getContestent()
         {
             int randomValue = random.Next(0, 100);
             if (randomValue < 75)
@@ -96,7 +96,7 @@ namespace mostdev_hungergames.controller
 			// single round:
 			// pick N contestents and let them fight a duel. 
 			// duel based on attack defense and chance
-
+			startDuel();
 			// check if any of the contestents has died
 			contestents.RemoveAll(x => x.Health < 1);
 
@@ -112,6 +112,21 @@ namespace mostdev_hungergames.controller
 
 
 		}
+		private void startDuel()
+		{
+			int rnd1 = random.Next(0, contestents.Count);
+			int rnd2 = random.Next(0, contestents.Count);
+			while (rnd1 == rnd2)
+			{
+				rnd2 = random.Next(0, contestents.Count);
+			}
+			Console.WriteLine("duel with {0} and {1}", rnd1,rnd2);
+			Contestent contestent1 = contestents[rnd1];
+			Contestent contestent2 = contestents[rnd2];
+
+			
+		}
+		
 
     }
 }
