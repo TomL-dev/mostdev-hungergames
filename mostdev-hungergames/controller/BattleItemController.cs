@@ -26,7 +26,7 @@ namespace mostdev_hungergames.controller
 
 		}
 
-		public BattleItem getRandomBattleItem()
+		public BattleItem GetRandomBattleItem()
 		{
 			return battleItems[random.Next(battleItems.Count)];
 		}
