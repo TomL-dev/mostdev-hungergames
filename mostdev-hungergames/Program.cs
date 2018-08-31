@@ -8,15 +8,7 @@ namespace mostdev_hungergames
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Welcome to the HungerGames");
-
-            GameController controller = new GameController();
-            controller.playGame();
-            Contestent winner = controller.Winner;
-            Console.WriteLine("The winner is: " + winner.Name);
-            Console.WriteLine(Environment.NewLine + "President Snow kills the winner: " + winner.Name);
-            Console.ReadLine();
-
+            new GameController().playGame();
         }
     }
 }

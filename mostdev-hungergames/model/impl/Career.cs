@@ -10,6 +10,7 @@ namespace mostdev_hungergames.model.impl
         public Career(string name, Gender gender, int attackBonus, BattleItem battleItem) : base(name, gender)
         {
             this.AttackLevel += attackBonus;
+			this.battleItem = battleItem;
         }
     }
 }
