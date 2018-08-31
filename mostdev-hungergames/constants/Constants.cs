@@ -21,6 +21,8 @@ namespace mostdev_hungergames.constants
 		public static int RARE_ATTACK_BONUS_MIN = 25;
 		public static int RARE_ATTACK_BONUS_MAX = 45;
 
+		public static int FIND_BATTLE_ITEM_THRESHOLD = 20;
+
 		// for battle items
 		// for initiial starting bonus
         public static int MIN_ATTACK_BONUS = 2;
@@ -29,10 +31,10 @@ namespace mostdev_hungergames.constants
         public static int MAX_DEFENSE_BONUS = 10;
 
 		// random bonus damage during duels
-		public static int MIN_DUEL_ATTACK_BONUS = 2;
-		public static int MAX_DUEL_ATTACK_BONUS = 15;
-		public static int MIN_DUEL_DEFENSE_BONUS = 1;
-		public static int MAX_DUEL_DEFENSE_BONUS = 5;
+		public static int MIN_DUEL_ATTACK_BONUS = 5;
+		public static int MAX_DUEL_ATTACK_BONUS = 20;
+		public static int MIN_DUEL_DEFENSE_BONUS = 0;
+		public static int MAX_DUEL_DEFENSE_BONUS = 10;
 
     }
 }

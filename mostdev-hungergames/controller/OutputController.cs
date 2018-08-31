@@ -5,22 +5,23 @@ using System.Text;
 
 namespace mostdev_hungergames.controller
 {
-	class OutputController
+	static class OutputController
 	{
-		private readonly List<string> summary = new List<string>();
+		private static readonly List<String> summary = new List<String>();
 
-		public void Log(string message)
+		public static void Log(string message, params object[] arguments)
 		{
 			if (Constants.EXTENDED_LOG)
 			{
-				Console.WriteLine(message);
+				Console.WriteLine(message, arguments);
 			}
 		}
-		public void AddToSummary(string message)
+		public static void AddToSummary(string message, params object[] arguments)
 		{
-			summary.Add(message);
+			summary.Add(String.Format(message, arguments));
+			Log(message, arguments);
 		}
-		public void PrintSummary()
+		public static void PrintSummary()
 		{
 			summary.ForEach(entry => Console.WriteLine(entry));
 		}

@@ -21,5 +21,11 @@ namespace mostdev_hungergames.model
 		}
 
 		public string Name { get; protected set; }
+
+		public override string ToString()
+		{
+			string bonus = attackBonus > 0 ? "Attack bonus: " + AttackBonus : "Defense bonus: " + DefenseBonus;
+			return String.Format("{0}, {1}", Name, bonus);
+		}
 	}
 }

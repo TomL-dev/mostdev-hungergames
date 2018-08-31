@@ -14,7 +14,6 @@ namespace mostdev_hungergames.model
 		public string Name { get; private set; }
 		public Gender Gender { get; private set; }
 
-		private const string Format = "Contestent: {0}, Type: {1}, AttackLevel: {2), DefenseLevel: {3}";
 		private int health = Constants.HEALTH;
 		private int attackLevel = 100;
 		private int defenseLevel = 100;
@@ -32,7 +31,6 @@ namespace mostdev_hungergames.model
 			get { return defenseLevel; }
 			protected set { defenseLevel = value; }
 		}
-
 
 		public int Health
 		{
@@ -64,16 +62,15 @@ namespace mostdev_hungergames.model
 			int rareAttackBonus = getRareAttackBonus();
 			if (rareAttackBonus > 0)
 			{
-				Console.WriteLine("rare attack bonus: {0}", rareAttackBonus);
-				randomBonusDamage += rareAttackBonus;	
+				OutputController.Log("Rare attack bonus: {0}", rareAttackBonus);
+				randomBonusDamage += rareAttackBonus;
 			}
 			damage += randomBonusDamage;
 
-			Console.WriteLine("attack: {0}, ({1}) ", damage, randomBonusDamage);
+			OutputController.Log("Attack: {0}({1}) ", damage, randomBonusDamage);
 			opponent.Defend(damage);
-
-			Console.WriteLine();
 		}
+
 		public void Defend(int receivedAttack)
 		{
 			int randomBonusDefense = random.Next(Constants.MIN_DUEL_DEFENSE_BONUS, Constants.MAX_DUEL_DEFENSE_BONUS); // add random defense bonus
@@ -82,22 +79,21 @@ namespace mostdev_hungergames.model
 			{
 				defense += battleItem.DefenseBonus;
 			}
-			Console.WriteLine("defense: {0}({1})", defense, randomBonusDefense);
+			OutputController.Log("Defense: {0}({1})", defense, randomBonusDefense);
 			int delta = receivedAttack - defense;
-			Console.WriteLine("delta: " + delta);
 
 			if (delta > 0)
 			{
 				this.health -= delta;
-				Console.WriteLine("received damage: {0}, Health now: {1}", delta, health);
+				OutputController.Log("Received damage: {0}, Health now: {1}", delta, health);
 			}
 			else
 			{
-				Console.WriteLine("defended the attack");
+				OutputController.Log("Defended the attack");
 			}
-			
-			//this.health -= receivedDamage;
+			OutputController.Log("");
 		}
+
 		public bool IsDead()
 		{
 			return health <= 0;
@@ -107,38 +103,32 @@ namespace mostdev_hungergames.model
 		{
 			if (this.battleItem == null)
 			{
-				if (random.Next(0, 100) < 25)
+				if (random.Next(0, 100) < Constants.FIND_BATTLE_ITEM_THRESHOLD)
 				{
 					this.battleItem = GameController.battleItemController.GetRandomBattleItem();
-					Console.Write("{0} found a new BattleItem:  {1}, ", this.Name, this.battleItem.Name);
-					if (this.battleItem.AttackBonus > 0)
-					{
-						Console.WriteLine("Attack bonus: {0}", this.battleItem.AttackBonus);
-					}
-					else
-					{
-						Console.WriteLine("Defense bonus: {0}", this.battleItem.DefenseBonus);
-					}
+					OutputController.AddToSummary("{0} found a new BattleItem: {1}", this.Name, this.battleItem);
 				}
 			}
 		}
-
 
 		private int getRandomAttackBonus()
 		{
 			return getRandomValue(Constants.MIN_DUEL_ATTACK_BONUS, Constants.MAX_DUEL_ATTACK_BONUS);
 		}
+
 		private int getRandomDefenceBonus()
 		{
 			return getRandomValue(Constants.MIN_DUEL_DEFENSE_BONUS, Constants.MAX_DUEL_DEFENSE_BONUS);
 		}
+
 		private int getRareAttackBonus()
 		{
 			int chance = getRandomValue(0, Constants.RARE_ATTACK_BONUS_RANGE);
 			if (chance > Constants.RARE_ATTACK_BONUS_THRESHOLD)
 			{
 				return getRandomValue(Constants.RARE_ATTACK_BONUS_MIN, Constants.RARE_ATTACK_BONUS_MAX);
-			} else
+			}
+			else
 			{
 				return 0;
 			}
@@ -148,25 +138,32 @@ namespace mostdev_hungergames.model
 			return random.Next(minValue, maxValue);
 		}
 
-
 		private string GetTypeString()
 		{
 			return GetType().ToString().Substring(GetType().ToString().LastIndexOf('.') + 1);
 		}
+
 		public override string ToString()
 		{
-			return String.Format("Name: {0,10}, Type: {1,10}", Name, GetTypeString());
+			return String.Format("Name: {0}, Type: {1}", Name, GetTypeString());
 		}
+
 		public string Introduce()
 		{
-			return String.Format("Name: {0,10}, Type: {1,10}, Attack: {2} Defense: {3}", Name, GetTypeString(), AttackLevel, DefenseLevel);
-		}
-		public string ShowDuelStats()
-		{
-			string s = String.Format("Name: {0,10}, Type: {1, 10}, Attack: {2}, Defense: {3}", Name, GetTypeString(), AttackLevel, DefenseLevel);
+			string introduction = String.Format("Name: {0,10}, Type: {1,10}, Attack: {2} Defense: {3}", Name, GetTypeString(), AttackLevel, DefenseLevel);
 			if (this.battleItem != null)
 			{
-				s += String.Format(", BattleItem: {0}, AttackBonus: {1}, DefenseBonus: {2}", battleItem.Name, battleItem.AttackBonus, battleItem.DefenseBonus);
+				introduction += String.Format(", BattleItem: {0}", battleItem.ToString());
+			}
+			return introduction;
+		}
+
+		public string ShowDuelStats()
+		{
+			string s = String.Format("Name: {0}, Type: {1}, Attack: {2}, Defense: {3}", Name, GetTypeString(), AttackLevel, DefenseLevel);
+			if (this.battleItem != null)
+			{
+				s += String.Format(", BattleItem: {0}", battleItem.ToString());
 			}
 			return s;
 		}

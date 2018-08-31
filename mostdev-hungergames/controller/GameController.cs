@@ -11,7 +11,6 @@ namespace mostdev_hungergames.controller
 	class GameController
 	{
 		private List<Contestent> contestents = new List<Contestent>();
-		public static readonly OutputController outputController = new OutputController();
 
 		public static BattleItemController battleItemController = new BattleItemController();
 		int days = 1;
@@ -19,32 +18,25 @@ namespace mostdev_hungergames.controller
 
 		public void playGame()
 		{
-			outputController.Log("Welcome to the");
-			outputController.Log(@"
-    )            )               (                       *          (     
- ( /(         ( /(  (            )\ )  (        (      (  `         )\ )  
- )\())    (   )\()) )\ )    (   (()/(  )\ )     )\     )\))(   (   (()/(  
-((_)\     )\ ((_)\ (()/(    )\   /(_))(()/(  ((((_)(  ((_)()\  )\   /(_)) 
- _((_) _ ((_) _((_) /(_))_ ((_) (_))   /(_))_ )\ _ )\ (_()((_)((_) (_))   
-| || || | | || \| |(_)) __|| __|| _ \ (_)) __|(_)_\(_)|  \/  || __|/ __|  
-| __ || |_| || .` |  | (_ || _| |   /   | (_ | / _ \  | |\/| || _| \__ \  
-|_||_| \___/ |_|\_|   \___||___||_|_\    \___|/_/ \_\ |_|  |_||___||___/ 
-
-");
-			outputController.Log("Gathering contestents...");
+			GameIntroduction();
+			OutputController.Log("Gathering contestents...");
 			contestents.AddRange(generateContestens(Constants.NR_OF_CONTESTENS));
-			outputController.Log("Now introducing the contestents:");
-			contestents.ForEach(contestent => outputController.Log(contestent.Introduce()));
-			// loop through game
+
+			OutputController.Log("Now introducing the contestents:");
+			contestents.ForEach(contestent => OutputController.Log(contestent.Introduce()));
 
 			while (contestents.Count > 1)
 			{
 				nextRound();
 			}
 
-			Contestent winner = contestents[0];
-			Console.WriteLine("The winner is: " + winner.Name);
-			Console.WriteLine(Environment.NewLine + "President Snow kills the winner: " + winner.Name);
+			OutputController.AddToSummary(Environment.NewLine + "The Hungergames have ended");
+			string s = contestents[0].Gender == Gender.Female ? "her" : "his";
+			OutputController.AddToSummary("We have a winner: {0} name is: {1}", s, contestents[0].Name);
+
+			OutputController.PrintSummary();
+
+			Console.WriteLine("President Snow kills the winner: {0}", contestents[0].Name);
 			Console.ReadLine();
 		}
 
@@ -107,11 +99,10 @@ namespace mostdev_hungergames.controller
 
 		private void nextRound()
 		{
-			Console.WriteLine("\nday {0} has started, {1} contestents are alive", days++, contestents.Count);
+			OutputController.Log("Day {0} has started, {1} contestents are alive", days++, contestents.Count);
 			// single round:
-			// pick N contestents and let them fight a duel. 
 			// duel based on attack defense and chance
-			startDuel();
+			StartDuel();
 			// check if any of the contestents has died
 			contestents.RemoveAll(x => x.Health < 1);
 
@@ -121,7 +112,7 @@ namespace mostdev_hungergames.controller
 			// at end of day surviving contestents have chance of finding battle item
 			contestents.ForEach(x => x.SearchForBattleItem());
 		}
-		private void startDuel()
+		private void StartDuel()
 		{
 			int rnd1 = random.Next(0, contestents.Count);
 			int rnd2 = random.Next(0, contestents.Count);
@@ -129,39 +120,46 @@ namespace mostdev_hungergames.controller
 			{
 				rnd2 = random.Next(0, contestents.Count);
 			}
-			Console.WriteLine("duel with {0} and {1}", rnd1, rnd2);
 			Contestent contestent1 = contestents[rnd1];
 			Contestent contestent2 = contestents[rnd2];
-			Console.WriteLine("contestent1: " + contestent1.ShowDuelStats());
-			Console.WriteLine("contestent2: " + contestent2.ShowDuelStats());
+
+			OutputController.AddToSummary(Environment.NewLine + "Duel between: {0} and {1}", contestent1.Name, contestent2.Name);
+			OutputController.Log("----------------------------------------------------------------");
+			OutputController.Log("Contestent1: " + contestent1.ShowDuelStats());
+			OutputController.Log("Contestent2: " + contestent2.ShowDuelStats());
+
 			while (!contestent1.IsDead() && !contestent2.IsDead())
 			{
-				Console.WriteLine("----------------------------------------------------------------");
-				Console.WriteLine("{0}({1}) attacks {2}({3})", contestent1.Name, contestent1.Health, contestent2.Name, contestent2.Health);
+				
+				OutputController.Log("{0}({1}) attacks {2}({3})", contestent1.Name, contestent1.Health, contestent2.Name, contestent2.Health);
 				contestent1.Attack(contestent2);
 				if (!contestent1.IsDead() && !contestent2.IsDead())
 				{
-					Console.WriteLine("{0}({1}) attacks {2}({3})", contestent2.Name, contestent2.Health, contestent1.Name, contestent1.Health);
+					OutputController.Log("{0}({1}) attacks {2}({3})", contestent2.Name, contestent2.Health, contestent1.Name, contestent1.Health);
 					contestent2.Attack(contestent1);
 				}
-				Console.WriteLine("----------------------------------------------------------------");
-				//Console.ReadLine();
+				
 			}
-			Contestent duelWinner = null;
-
-			if (!contestent1.IsDead())
-			{
-				duelWinner = contestent1;
-
-			}
-			else
-			{
-				duelWinner = contestent2;
-			}
-			Console.WriteLine("{0} is the winner of the Dual ({1} vs {2})", duelWinner.Name, contestent1.Name, contestent2.Name);
-
+			OutputController.Log("----------------------------------------------------------------" + Environment.NewLine);
+			Contestent duelWinner = !contestent1.IsDead() ? contestent1 : contestent2;
+			Contestent duelLoser = contestent1.IsDead() ? contestent1 : contestent2;
+			
+			OutputController.AddToSummary("{0} won the duel! {1} died in combat", duelWinner.Name, duelLoser.Name);
 		}
 
-
+		private void GameIntroduction()
+		{
+			Console.WriteLine("Welcome to the");
+			Console.WriteLine(@"
+    )            )               (                       *          (     
+ ( /(         ( /(  (            )\ )  (        (      (  `         )\ )  
+ )\())    (   )\()) )\ )    (   (()/(  )\ )     )\     )\))(   (   (()/(  
+((_)\     )\ ((_)\ (()/(    )\   /(_))(()/(  ((((_)(  ((_)()\  )\   /(_)) 
+ _((_) _ ((_) _((_) /(_))_ ((_) (_))   /(_))_ )\ _ )\ (_()((_)((_) (_))   
+| || || | | || \| |(_)) __|| __|| _ \ (_)) __|(_)_\(_)|  \/  || __|/ __|  
+| __ || |_| || .` |  | (_ || _| |   /   | (_ | / _ \  | |\/| || _| \__ \  
+|_||_| \___/ |_|\_|   \___||___||_|_\    \___|/_/ \_\ |_|  |_||___||___/ 
+");
+		}
 	}
 }
